@@ -64,7 +64,6 @@ class UsersViewModel : ViewModel() {
                             usersListLiveData.postValue(model)
                         }
                     })
-
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
