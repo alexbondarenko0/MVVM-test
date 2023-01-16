@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alexeybondarenko.mvvmtest2.databinding.FragmentUsersBinding
+import com.alexeybondarenko.mvvmtest2.model.UsersListModel
 import com.alexeybondarenko.mvvmtest2.utils.UsersAdapter
 import com.alexeybondarenko.mvvmtest2.viewmodel.UsersViewModel
 
@@ -34,12 +35,23 @@ class UsersFragment : Fragment() {
 
         initUsersList()
         setOnClickListeners()
-        setUsersListUpdateObserver()
+        setUsersListUpdateObservers()
+
+        viewModel.usersListLiveData.postValue(context?.let { viewModel.loadDataFromDB(it) })
+        context?.let { fillList(viewModel.usersListLiveData.value) }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         viewBinding = null
+        context?.let { viewModel.saveCurrentModelToDB(it) }
+    }
+
+    private fun fillList(usersListModel: UsersListModel?) {
+        if (usersListModel != null) {
+            binding.rvUsersList.adapter = UsersAdapter(usersListModel.list, context)
+            binding.tvEmptyListWarning.isVisible = usersListModel.list.isEmpty()
+        }
     }
 
     private fun initUsersList() {
@@ -52,10 +64,10 @@ class UsersFragment : Fragment() {
         binding.btnDeleteRandomUser.setOnClickListener { viewModel.deleteRandomUser() }
     }
 
-    private fun setUsersListUpdateObserver() {
+    private fun setUsersListUpdateObservers() {
         viewModel.usersListLiveData.observe(viewLifecycleOwner, Observer { updatedUsersModel ->
-            binding.tvEmptyListWarning.isVisible = updatedUsersModel.list.isEmpty()
-            binding.rvUsersList.adapter = UsersAdapter(updatedUsersModel.list, context)
+            fillList(updatedUsersModel)
+            context?.let { viewModel.saveCurrentModelToDB(it) }
         })
 
         viewModel.showUpdatingProcess.observe(viewLifecycleOwner, Observer { updatedVisible ->

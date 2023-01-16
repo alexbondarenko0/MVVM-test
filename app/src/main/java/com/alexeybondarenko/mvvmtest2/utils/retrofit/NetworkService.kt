@@ -10,7 +10,7 @@ class NetworkService private constructor() {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-    val newsApi: GithubApi
+    val githubApi: GithubApi
         get() = retrofit.create(GithubApi::class.java)
 
     companion object {
