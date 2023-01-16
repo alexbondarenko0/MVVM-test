@@ -1,10 +1,10 @@
 package com.alexeybondarenko.mvvmtest2.viewmodel
 
-import android.content.Context
+import android.app.Application
 import android.util.Log
 import android.widget.Toast
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alexeybondarenko.mvvmtest2.model.UserModel
 import com.alexeybondarenko.mvvmtest2.model.UsersListModel
@@ -17,7 +17,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
 
-class UsersViewModel : ViewModel() {
+class UsersViewModel(application: Application) : AndroidViewModel(application) {
 
     private var model: UsersListModel = UsersListModel(mutableListOf())
 
@@ -41,19 +41,19 @@ class UsersViewModel : ViewModel() {
         }
     }
 
-    fun saveCurrentModelToDB(context: Context) {
+    fun saveCurrentModelToDB() {
         model = usersListLiveData.value ?: UsersListModel(mutableListOf())
-        Toast.makeText(context, "Данные сохранены", Toast.LENGTH_SHORT).show()
-        DBHelper().saveToDB(context, model)
+        Toast.makeText(getApplication(), "Данные сохранены", Toast.LENGTH_SHORT).show()
+        DBHelper().saveToDB(getApplication(), model)
     }
 
-    fun loadDataFromDB(context: Context): UsersListModel? {
-        val result: UsersListModel = DBHelper().importFromDB(context)
+    fun loadDataFromDB(): UsersListModel? {
+        val result: UsersListModel = DBHelper().importFromDB(getApplication())
         return if (result.list.isEmpty()) {
-            Toast.makeText(context, "Нет сохраненных данных", Toast.LENGTH_SHORT).show()
+            Toast.makeText(getApplication(), "Нет сохраненных данных", Toast.LENGTH_SHORT).show()
             null
         } else {
-            Toast.makeText(context, "Данные загружены", Toast.LENGTH_SHORT).show()
+            Toast.makeText(getApplication(), "Данные загружены", Toast.LENGTH_SHORT).show()
             result
         }
     }

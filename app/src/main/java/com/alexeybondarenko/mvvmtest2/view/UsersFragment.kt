@@ -37,14 +37,14 @@ class UsersFragment : Fragment() {
         setOnClickListeners()
         setUsersListUpdateObservers()
 
-        viewModel.usersListLiveData.postValue(context?.let { viewModel.loadDataFromDB(it) })
-        context?.let { fillList(viewModel.usersListLiveData.value) }
+        viewModel.usersListLiveData.postValue(viewModel.loadDataFromDB())
+        fillList(viewModel.usersListLiveData.value)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         viewBinding = null
-        context?.let { viewModel.saveCurrentModelToDB(it) }
+        viewModel.saveCurrentModelToDB()
     }
 
     private fun fillList(usersListModel: UsersListModel?) {
@@ -67,7 +67,7 @@ class UsersFragment : Fragment() {
     private fun setUsersListUpdateObservers() {
         viewModel.usersListLiveData.observe(viewLifecycleOwner, Observer { updatedUsersModel ->
             fillList(updatedUsersModel)
-            context?.let { viewModel.saveCurrentModelToDB(it) }
+            viewModel.saveCurrentModelToDB()
         })
 
         viewModel.showUpdatingProcess.observe(viewLifecycleOwner, Observer { updatedVisible ->
